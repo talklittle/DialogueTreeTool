@@ -75,7 +75,7 @@
             // addBranchToolStripMenuItem
             // 
             this.addBranchToolStripMenuItem.Name = "addBranchToolStripMenuItem";
-            this.addBranchToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.addBranchToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
             this.addBranchToolStripMenuItem.Text = "Add branch";
             this.addBranchToolStripMenuItem.Click += new System.EventHandler(this.addBranchToolStripMenuItem_Click);
             // 
