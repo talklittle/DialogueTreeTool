@@ -11,6 +11,8 @@ namespace DialogueTreeTool
 {
     public partial class Form1 : Form
     {
+        private const int RESIZE_POINTER_BOX = 5;
+
         // used for dragging
         private Point start, rightClickLocation;
 
@@ -36,6 +38,7 @@ namespace DialogueTreeTool
             p.Bounds = new Rectangle(x, y, 200, 200);
             p.BorderStyle = BorderStyle.FixedSingle;
             p.MouseDown += new MouseEventHandler(panel_MouseDown);
+            p.MouseHover += new EventHandler(panel_MouseHover);
 
             SplitContainer sc = new SplitContainer();
             sc.Orientation = Orientation.Horizontal;
@@ -58,9 +61,22 @@ namespace DialogueTreeTool
         {
             if (e.Button == MouseButtons.Left)
             {
-                start = e.Location;
-                ((Control)sender).MouseUp += new MouseEventHandler(panel_MouseUp);
-                ((Control)sender).MouseMove += new MouseEventHandler(panel_MouseMove);
+                Control branch = (Control) sender;
+                Point relmouse = branch.PointToClient(Cursor.Position);
+
+                if (Math.Abs(relmouse.X - branch.Width) <= RESIZE_POINTER_BOX
+                        && Math.Abs(relmouse.Y - branch.Height) <= RESIZE_POINTER_BOX)
+                {
+                    // resize the panel from bottom-right corner
+                    start = e.Location;
+                    branch.MouseMove += new MouseEventHandler(panel_MouseMove_resize);
+                    branch.MouseUp += new MouseEventHandler(panel_MouseUp_resize);
+                } else {
+                    // drag the panel
+                    start = e.Location;
+                    branch.MouseUp += new MouseEventHandler(panel_MouseUp);
+                    branch.MouseMove += new MouseEventHandler(panel_MouseMove);
+                }
             }
         }
 
@@ -83,6 +99,38 @@ namespace DialogueTreeTool
         {
             Control branch = (Control) sender;
             branch.Location = new Point(branch.Location.X - (start.X - e.X), branch.Location.Y - (start.Y - e.Y));
+        }
+
+        void panel_MouseUp_resize(object sender, MouseEventArgs e)
+        {
+            ((Control)sender).MouseMove -= new MouseEventHandler(panel_MouseMove_resize);
+            ((Control)sender).MouseUp -= new MouseEventHandler(panel_MouseUp_resize);
+        }
+
+        void panel_MouseMove_resize(object sender, MouseEventArgs e)
+        {
+            Control branch = (Control) sender;
+            branch.Width = e.X;
+            branch.Height = e.Y;
+        }
+
+        /**
+         * Used for resizing the dialogue branch panels
+         */
+        void panel_MouseHover(object sender, EventArgs e)
+        {
+            Control branch = (Control)sender;
+            Point relmouse = branch.PointToClient(Cursor.Position);
+
+            if (Math.Abs(relmouse.X - branch.Width) <= RESIZE_POINTER_BOX
+                    && Math.Abs(relmouse.Y - branch.Height) <= RESIZE_POINTER_BOX)
+            {
+                Cursor.Current = Cursors.SizeNWSE;
+            }
+            else
+            {
+                Cursor.Current = Cursors.Arrow;
+            }
         }
 
 
